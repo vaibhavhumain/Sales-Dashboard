@@ -495,29 +495,38 @@ export default function DashboardPage() {
           )}
 
           {selectedChart === 'person' && (
-            <>
-              <h2 className="text-lg font-semibold mb-3">Revenue by Sales Person</h2>
-              <div style={{ width: '100%', height: 300 }}>
-                <ResponsiveContainer>
-                  <PieChart>
-                    <Pie
-                      data={salesByPerson}
-                      dataKey="revenue"
-                      nameKey="name"
-                      outerRadius={100}
-                      label
-                    >
-                      {salesByPerson.map((_, i) => (
-                        <Cell key={i} fill={COLORS[i % COLORS.length]} />
-                      ))}
-                    </Pie>
-                    <Tooltip />
-                    <Legend />
-                  </PieChart>
-                </ResponsiveContainer>
-              </div>
-            </>
-          )}
+  <>
+    <h2 className="text-lg font-semibold mb-3">Revenue by Sales Person</h2>
+    <div style={{ width: '100%', height: 300 }}>
+      <ResponsiveContainer>
+        <PieChart>
+          <Pie
+            data={salesByPerson}
+            dataKey="revenue"
+            nameKey="name"
+            outerRadius={100}
+            label
+          >
+            {salesByPerson.map((_, i) => (
+              <Cell key={i} fill={COLORS[i % COLORS.length]} />
+            ))}
+          </Pie>
+
+          <Tooltip />
+
+          {/* ✅ Custom Legend to show "Name - Revenue" */}
+          <Legend
+            formatter={(value, entry) => {
+              const item = salesByPerson.find((p) => p.name === value);
+              return `${value} — ₹${item?.revenue.toLocaleString()}`;
+            }}
+          />
+        </PieChart>
+      </ResponsiveContainer>
+    </div>
+  </>
+)}
+
         </div>
       </div>
     </>
