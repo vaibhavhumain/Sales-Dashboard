@@ -11,28 +11,27 @@ export default function LoginPage() {
   const [error, setError] = useState("");
 
   async function handleLogin(e: any) {
-    e.preventDefault();
-    setError("");
+  e.preventDefault();
 
-    const res = await fetch(
-      "https://sales-backend-1.onrender.com/api/auth/login",
-      {
-        method: "POST",
-        body: JSON.stringify({ email, password }),
-        headers: { "Content-Type": "application/json" },
-      }
-    );
+  const res = await fetch("https://sales-backend-1.onrender.com/api/auth/login", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      email: email.trim(),
+      password: password.trim(),
+    }),
+  });
 
-    const data = await res.json();
+  const data = await res.json();
 
-    if (!res.ok) {
-      setError(data.error || "Login failed");
-      return;
-    }
-
-    // No token needed — only one admin access  
-    router.push("/dashboard");
+  if (!res.ok) {
+    alert(data.error || "Login Failed");
+    return;
   }
+
+  router.push("/dashboard");
+}
+
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
