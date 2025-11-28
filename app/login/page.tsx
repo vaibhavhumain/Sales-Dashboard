@@ -8,72 +8,86 @@ export default function LoginPage() {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  async function handleLogin(e: any) {
-  e.preventDefault();
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
 
-  const res = await fetch("https://sales-backend-1.onrender.com/api/auth/login", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      email: email.trim(),
-      password: password.trim(),
-    }),
-  });
+    try {
+      const res = await fetch("/api/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
 
-  const data = await res.json();
+      const data = await res.json();
 
-  if (!res.ok) {
-    alert(data.error || "Login Failed");
-    return;
-  }
+      if (!res.ok) {
+        setError(data.message || "Invalid credentials");
+        setLoading(false);
+        return;
+      }
 
-  if (data.token) {
-    localStorage.setItem("token", data.token);
-  }
+      // Save token
+      localStorage.setItem("token", data.token);
 
-  router.push("/dashboard");
-}
+      // Redirect
+      router.push("/dashboard");
+    } catch (err) {
+      setError("Something went wrong. Try again.");
+    }
 
-
+    setLoading(false);
+  };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
-      <div className="w-full max-w-md p-8 rounded-2xl backdrop-blur-xl bg-white/10 border border-white/20 shadow-2xl">
-        
-        <h1 className="text-3xl font-bold text-center text-white mb-6">
+    <div className="min-h-screen flex items-center justify-center bg-slate-950 p-4">
+      <div className="w-full max-w-md bg-slate-900 p-8 rounded-2xl shadow-xl shadow-black/40 border border-slate-700">
+        <h1 className="text-3xl font-bold text-white text-center mb-6">
           Login
         </h1>
 
-        {/* Error Message */}
         {error && (
-          <p className="text-red-400 text-center mb-4">{error}</p>
+          <p className="mb-4 text-red-400 text-center font-medium">{error}</p>
         )}
 
-        <form onSubmit={handleLogin} className="space-y-4">
-          <input
-            type="email"
-            placeholder="Email"
-            className="w-full p-3 rounded-lg bg-white/20 text-white placeholder-gray-300 border border-white/30 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            onChange={(e) => setEmail(e.target.value)}
-          />
+        <form onSubmit={handleLogin} className="space-y-5">
+          <div>
+            <label className="text-gray-300 text-sm">Email</label>
+            <input
+              type="email"
+              required
+              className="w-full mt-1 px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-blue-500"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Enter your email"
+            />
+          </div>
 
-          <input
-            type="password"
-            placeholder="Password"
-            className="w-full p-3 rounded-lg bg-white/20 text-white placeholder-gray-300 border border-white/30 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            onChange={(e) => setPassword(e.target.value)}
-          />
+          <div>
+            <label className="text-gray-300 text-sm">Password</label>
+            <input
+              type="password"
+              required
+              className="w-full mt-1 px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-blue-500"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Enter password"
+            />
+          </div>
 
           <button
-            className="w-full py-3 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold transition"
+            type="submit"
+            disabled={loading}
+            className="w-full py-2 bg-blue-600 hover:bg-blue-700 rounded-lg font-semibold text-white transition disabled:bg-blue-900"
           >
-            Login
+            {loading ? "Logging in..." : "Login"}
           </button>
         </form>
-
       </div>
     </div>
   );
-}
+} 

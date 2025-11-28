@@ -145,15 +145,19 @@ export default function DashboardPage() {
     }
   }
 
-  useEffect(() => {
-  const token = localStorage.getItem("token");
+useEffect(() => {
+  if (typeof window !== "undefined") {
+    const token = localStorage.getItem("token");
 
-  if (!token) {
-    router.push("/login");   // redirect if not logged in
-  } else {
-    setLoading(false);       // allow dashboard to load
+    if (!token) {
+      router.replace("/login");
+    } else {
+      setLoading(false);
+    }
   }
 }, []);
+
+
     
   // Reset selected week when month changes
   useEffect(() => {
@@ -245,9 +249,11 @@ export default function DashboardPage() {
       dayjs(a.Month, 'MMMM YYYY').toDate().getTime() -
       dayjs(b.Month, 'MMMM YYYY').toDate().getTime(),
   );
-  if (loading) {
+  
+ if (loading) {
   return <p className="text-white p-10">Checking authentication...</p>;
 }
+
 
 
   return (
@@ -457,14 +463,17 @@ export default function DashboardPage() {
               <h2 className="text-lg font-semibold mb-3">Sales Entries Per Day</h2>
               <div style={{ width: '100%', height: 300 }}>
                 <ResponsiveContainer>
-                  <BarChart data={filteredData}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="Date" />
-                    <YAxis />
-                    <Tooltip />
-                    <Bar dataKey="SalesCount" fill="#00bfff" radius={[6, 6, 0, 0]} />
-                  </BarChart>
-                </ResponsiveContainer>
+  <BarChart data={filteredData}>
+    <CartesianGrid strokeDasharray="3 3" />
+    <XAxis dataKey="Date" />
+    <YAxis />
+    <Tooltip />
+    <Legend />
+
+    <Bar dataKey="SalesCount" fill="#00bfff" />
+  </BarChart>
+</ResponsiveContainer>
+
               </div>
             </>
           )}
